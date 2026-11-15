@@ -1,6 +1,6 @@
 ---
 title: 部署到 Cloudflare Pages
-published: 2026-01-20
+published: 2026-11-15
 description: 从 GitHub 仓库到自定义域名的完整流程。
 tags: [deploy]
 ---

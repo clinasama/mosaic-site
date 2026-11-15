@@ -1,6 +1,6 @@
 ---
 title: Hello, Mosaic
-published: 2026-02-01
+published: 2026-11-15
 description: Windows 8 开始屏幕风格的 Astro 7 个人站点模板。
 tags: [intro]
 ---

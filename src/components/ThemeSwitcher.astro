@@ -1,0 +1,152 @@
+---
+// SPDX-License-Identifier: MPL-2.0
+import { Icon } from 'astro-icon/components';
+---
+
+<div class="theme-switcher" role="group" aria-label="主题设置">
+  <input
+    type="range"
+    min="0"
+    max="360"
+    step="1"
+    class="hue-range"
+    id="hue-range"
+    aria-label="主题色色相"
+  />
+  <div class="mode-group">
+    <button type="button" class="mode-btn" data-mode="light" title="亮色" aria-label="亮色">
+      <Icon name="fa7-solid:sun" size={13} />
+    </button>
+    <button type="button" class="mode-btn" data-mode="dark" title="暗色" aria-label="暗色">
+      <Icon name="fa7-solid:moon" size={13} />
+    </button>
+    <button type="button" class="mode-btn" data-mode="system" title="跟随系统" aria-label="跟随系统">
+      <Icon name="fa7-solid:desktop" size={13} />
+    </button>
+  </div>
+</div>
+
+<style>
+  .theme-switcher {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    background: var(--surface);
+    border: 1px solid var(--border-subtle);
+    backdrop-filter: blur(8px);
+  }
+
+  .hue-range {
+    width: 84px;
+    height: 4px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: linear-gradient(to right,
+      oklch(0.7 0.18 0),
+      oklch(0.7 0.18 60),
+      oklch(0.7 0.18 120),
+      oklch(0.7 0.18 180),
+      oklch(0.7 0.18 240),
+      oklch(0.7 0.18 300),
+      oklch(0.7 0.18 360)
+    );
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+  .hue-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--primary);
+    border: 2px solid var(--text);
+    cursor: grab;
+  }
+  .hue-range::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--primary);
+    border: 2px solid var(--text);
+    cursor: grab;
+  }
+
+  .mode-group { display: flex; gap: 2px; }
+  .mode-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border: 0;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .mode-btn:hover { background: var(--surface-hover); color: var(--text); }
+  .mode-btn[aria-pressed="true"] { background: var(--primary); color: #fff; }
+</style>
+
+<script>
+  const HUE_KEY = 'hue';
+  const MODE_KEY = 'mode';
+  const root = document.documentElement;
+  const range = document.getElementById('hue-range') as HTMLInputElement | null;
+
+  const applyHue = (hue: number) => {
+    root.style.setProperty('--hue', String(hue));
+    if (range) range.value = String(hue);
+    try { localStorage.setItem(HUE_KEY, String(hue)); } catch {}
+  };
+
+  const applyMode = (mode: 'light' | 'dark' | 'system') => {
+    const resolved = mode === 'system'
+      ? (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+      : mode;
+    root.setAttribute('data-mode', resolved);
+    try { localStorage.setItem(MODE_KEY, mode); } catch {}
+    syncModeButtons(mode);
+  };
+
+  const syncModeButtons = (mode: string) => {
+    document.querySelectorAll<HTMLButtonElement>('.mode-btn').forEach((b) => {
+      b.setAttribute('aria-pressed', String(b.dataset.mode === mode));
+    });
+  };
+
+  range?.addEventListener('input', (e) => {
+    applyHue(Number((e.target as HTMLInputElement).value));
+  });
+
+  document.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('.mode-btn');
+    if (!btn) return;
+    const m = btn.dataset.mode as 'light' | 'dark' | 'system';
+    if (m) applyMode(m);
+  });
+
+  matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => {
+    try {
+      if (localStorage.getItem(MODE_KEY) === 'system') applyMode('system');
+    } catch {}
+  });
+
+  const initialHue = Number(localStorage.getItem(HUE_KEY)) || Number(getComputedStyle(root).getPropertyValue('--hue')) || 300;
+  const initialMode = (localStorage.getItem(MODE_KEY) as 'light' | 'dark' | 'system') || 'system';
+  applyHue(initialHue);
+  applyMode(initialMode);
+  document.addEventListener('astro:page-load', () => {
+    const m = (localStorage.getItem(MODE_KEY) as 'light' | 'dark' | 'system') || 'system';
+    syncModeButtons(m);
+    if (range) {
+      range.value = String(Number(localStorage.getItem(HUE_KEY)) || initialHue);
+    }
+  });
+</script>

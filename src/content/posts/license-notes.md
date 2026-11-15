@@ -1,6 +1,6 @@
 ---
 title: 许可证
-published: 2026-01-15
+published: 2026-11-15
 description: 代码 MPL-2.0，演示文章随代码一起分发。
 tags: [legal]
 ---

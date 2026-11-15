@@ -1,30 +1,52 @@
 ---
 // SPDX-License-Identifier: MPL-2.0
 import { ClientRouter } from 'astro:transitions';
+import ThemeSwitcher from '@/components/ThemeSwitcher.astro';
+import Lightbox from '@/components/Lightbox.astro';
+import { siteConfig } from '@/config';
 import '@fontsource-variable/noto-sans';
 import '@fontsource-variable/noto-sans-sc';
 import '@fontsource-variable/jetbrains-mono';
 import '@/styles/metro.css';
-import 'rehype-callouts/theme/obsidian';
 
 interface Props { title?: string; description?: string }
 const {
   title = 'mosaic · clina',
   description = 'clina 的个人站点，以 Windows 8 开始屏幕为界面，磁贴式导航。',
 } = Astro.props;
+
+const defaultHue = siteConfig.themeColor.hue;
+const themeFixed = siteConfig.themeColor.fixed;
 ---
 
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" style={`--hue:${defaultHue}`} data-mode="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <script is:inline set:html={`
+      (() => {
+        try {
+          const hue = localStorage.getItem('hue') || '${defaultHue}';
+          document.documentElement.style.setProperty('--hue', hue);
+          const saved = localStorage.getItem('mode');
+          const mode = saved === 'light' || saved === 'dark'
+            ? saved
+            : (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+          document.documentElement.setAttribute('data-mode', mode);
+        } catch {
+          document.documentElement.setAttribute('data-mode', 'dark');
+        }
+      })();
+    `}></script>
     <ClientRouter />
   </head>
   <body>
+    {!themeFixed && <ThemeSwitcher />}
     <slot />
+    <Lightbox />
   </body>
 </html>
 

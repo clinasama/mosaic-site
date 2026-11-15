@@ -1,6 +1,6 @@
 ---
 title: Markdown 示例
-published: 2026-01-28
+published: 2026-11-15
 description: 演示文章页对各类 Markdown 语法的渲染效果。
 tags: [guide]
 ---

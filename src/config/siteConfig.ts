@@ -7,4 +7,8 @@ export const siteConfig: SiteConfig = {
   author: 'clina',
   email: 'hi@clina.top',
   github: 'https://github.com/clinasama',
+  themeColor: {
+    hue: 300,
+    fixed: false,
+  },
 };

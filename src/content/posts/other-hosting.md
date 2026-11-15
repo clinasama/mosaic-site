@@ -1,6 +1,6 @@
 ---
 title: 其他托管平台
-published: 2026-01-18
+published: 2026-11-15
 description: Vercel、Netlify、GitHub Pages 的配置要点。
 tags: [deploy]
 ---

@@ -27,7 +27,7 @@ const author = post.data.author;
     <BackButton href="/posts/" label="返回文章列表" />
 
     {isPinned && (
-      <span style="display:inline-block;padding:2px 8px;border:1px solid var(--violet-5);border-radius:2px;font-size:.75rem;margin:16px 0 0;">
+      <span style="display:inline-block;padding:2px 8px;border:1px solid var(--primary);border-radius:2px;font-size:.75rem;margin:16px 0 0;">
         置顶
       </span>
     )}
@@ -47,7 +47,7 @@ const author = post.data.author;
     <Content />
 
     {(licenseName || sourceLink) && (
-      <footer style="margin-top:64px;padding-top:24px;border-top:1px solid rgba(255,255,255,.08);font-size:.8rem;opacity:.55;">
+      <footer style="margin-top:64px;padding-top:24px;border-top:1px solid var(--border-subtle);font-size:.8rem;opacity:.55;">
         {licenseName && (
           <p style="margin:0;">
             许可协议：{licenseUrl ? <a href={licenseUrl} target="_blank" rel="noopener noreferrer">{licenseName}</a> : licenseName}
@@ -64,8 +64,8 @@ const author = post.data.author;
 </MetroLayout>
 
 <style is:global>
-  article :global(a:not(.back-btn)) { color: var(--violet-5); }
-  article :global(img) { max-width: 100%; }
-  article :global(pre) { background: #0d0616; padding: 16px; overflow-x: auto; }
+  article :global(a:not(.back-btn)) { color: var(--primary); }
+  article :global(img) { max-width: 100%; display: block; margin: 16px 0; }
+  article :global(pre) { background: var(--bg-deep); padding: 16px; overflow-x: auto; }
   article :global(code){ font-size: .9em; }
 </style>

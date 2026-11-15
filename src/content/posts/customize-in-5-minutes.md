@@ -1,6 +1,6 @@
 ---
 title: 5 分钟改成自己的站点
-published: 2026-01-30
+published: 2026-11-15
 description: 从演示内容切换到个人内容的完整步骤。
 tags: [guide]
 ---

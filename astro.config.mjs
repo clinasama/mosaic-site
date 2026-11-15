@@ -7,20 +7,22 @@ import icon from 'astro-icon';
 import expressiveCode from 'astro-expressive-code';
 import { pluginLineNumbers } from '@expressive-code/plugin-line-numbers';
 import { unified } from '@astrojs/markdown-remark';
-import rehypeCallouts from 'rehype-callouts';
-import rehypeCodeGroup from 'rehype-code-group';
 import { remarkReadingTime } from './src/plugins/remark-reading-time.ts';
 
 export default defineConfig({
   site: 'https://clina.top',
+  image: {
+    service: { entrypoint: 'astro/assets/services/noop' },
+  },
   integrations: [
     expressiveCode({
-      themes: ['one-dark-pro'],
+      themes: ['one-dark-pro', 'one-light'],
+      themeCssSelector: (theme) =>
+        theme.type === 'dark' ? '[data-mode="dark"]' : '[data-mode="light"]',
       plugins: [pluginLineNumbers()],
       defaultProps: { showLineNumbers: true },
       styleOverrides: {
         borderRadius: '0px',
-        frames: { editorBackground: '#0d0616' },
         codeFontFamily: "'JetBrains Mono Variable', 'Fira Code', monospace",
       },
     }),
@@ -32,7 +34,7 @@ export default defineConfig({
     syntaxHighlight: false,
     processor: unified({
       remarkPlugins: [remarkReadingTime],
-      rehypePlugins: [rehypeCallouts, rehypeCodeGroup],
+      rehypePlugins: [],
     }),
   },
   vite: {

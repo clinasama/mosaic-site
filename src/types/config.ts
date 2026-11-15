@@ -15,4 +15,8 @@ export interface SiteConfig {
   author: string;
   email: string;
   github: string;
+  themeColor: {
+    hue: number;
+    fixed: boolean;
+  };
 }

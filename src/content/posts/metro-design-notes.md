@@ -1,6 +1,6 @@
 ---
 title: Metro 设计的几个取舍
-published: 2026-01-25
+published: 2026-11-15
 description: 为什么这个模板看起来像 Windows 8。
 tags: [design]
 ---
