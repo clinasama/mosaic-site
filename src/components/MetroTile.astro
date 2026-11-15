@@ -1,0 +1,63 @@
+---
+// SPDX-License-Identifier: MPL-2.0
+import { Icon } from 'astro-icon/components';
+
+interface Props {
+  label: string;
+  icon: string;
+  href: string;
+  size?: 'medium' | 'wide' | 'large';
+  color?: string;
+}
+const { label, icon, href, size = 'medium', color = 'var(--violet)' } = Astro.props;
+---
+
+<a class:list={['tile', `tile-${size}`]} href={href} data-href={href} style={`--tile-bg:${color}`}>
+  <div class="tile-scene">
+    <div class="tile-face tile-front">
+      <Icon name={icon} size={44} class="tile-icon" />
+      <span class="tile-label">{label}</span>
+    </div>
+    <div class="tile-face tile-back">
+      <span class="tile-label">{label}</span>
+    </div>
+  </div>
+</a>
+
+<style>
+  .tile { display: block; perspective: 900px; text-decoration: none; color: #fff; }
+  .tile-scene {
+    position: relative; width: 100%; height: 100%;
+    transform-style: preserve-3d;
+    transition: transform .5s cubic-bezier(.4, 0, .2, 1);
+  }
+  .tile.is-flipped .tile-scene { transform: rotateY(180deg); }
+  .tile-face {
+    position: absolute; inset: 0;
+    backface-visibility: hidden;
+    display: flex; flex-direction: column;
+    justify-content: space-between;
+    padding: 14px;
+    background: var(--tile-bg);
+  }
+  .tile-back {
+    transform: rotateY(180deg);
+    background: #fff; color: var(--tile-bg);
+    justify-content: center; align-items: center;
+    font-size: 1.3rem; font-weight: 300;
+  }
+  .tile-label { font-size: 1rem; font-weight: 300; }
+  .tile:active .tile-scene { transform: scale(.96); }
+</style>
+
+<script>
+  document.addEventListener('click', (e) => {
+    const tile = (e.target as HTMLElement).closest<HTMLAnchorElement>('.tile');
+    if (!tile || tile.classList.contains('is-flipped')) return;
+    const href = tile.dataset.href;
+    if (!href) return;
+    e.preventDefault();
+    tile.classList.add('is-flipped');
+    setTimeout(() => { window.location.href = href; }, 500);
+  });
+</script>

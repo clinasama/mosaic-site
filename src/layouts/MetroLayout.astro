@@ -1,0 +1,36 @@
+---
+// SPDX-License-Identifier: MPL-2.0
+import { ClientRouter } from 'astro:transitions';
+import '@fontsource-variable/noto-sans';
+import '@fontsource-variable/noto-sans-sc';
+import '@fontsource-variable/jetbrains-mono';
+import '@/styles/metro.css';
+import 'rehype-callouts/theme/obsidian';
+
+interface Props { title?: string; description?: string }
+const {
+  title = 'mosaic · clina',
+  description = 'clina 的个人站点，以 Windows 8 开始屏幕为界面，磁贴式导航。',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <ClientRouter />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  ::view-transition-old(root) { animation: metro-out .3s ease-in both; }
+  ::view-transition-new(root) { animation: metro-in .35s ease-out both; }
+  @keyframes metro-out { to { transform: translateX(-30px); opacity: 0; } }
+  @keyframes metro-in  { from { transform: translateX(30px); opacity: 0; } }
+</style>

@@ -1,0 +1,40 @@
+---
+// SPDX-License-Identifier: MPL-2.0
+import { getCollection } from 'astro:content';
+import MetroLayout from '@/layouts/MetroLayout.astro';
+import MetroTile from '@/components/MetroTile.astro';
+import BackButton from '@/components/BackButton.astro';
+
+const posts = (await getCollection('posts'))
+  .filter((p) => !p.data.draft)
+  .sort((a, b) => {
+    const da = new Date(a.data.published ?? a.data.pubDate ?? 0).getTime();
+    const db = new Date(b.data.published ?? b.data.pubDate ?? 0).getTime();
+    return db - da;
+  });
+
+const palette = ['var(--violet)', 'var(--violet-2)', 'var(--violet-3)', 'var(--violet-4)', 'var(--violet-5)'];
+---
+
+<MetroLayout title="Posts · mosaic">
+  <main style="min-height:100vh;padding:60px 0;">
+    <div style="padding:0 48px 8px;">
+      <BackButton href="/" label="返回开始屏幕" />
+    </div>
+    <header class="screen-head">
+      <h1>Posts</h1>
+      <p>{posts.length} ARTICLES</p>
+    </header>
+    <div class="tile-grid">
+      {posts.map((post, i) => (
+        <MetroTile
+          label={post.data.title}
+          icon="fa7-solid:file-lines"
+          href={`/posts/${post.id}/`}
+          size={i === 0 ? 'large' : i % 6 === 0 ? 'wide' : 'medium'}
+          color={palette[i % palette.length]}
+        />
+      ))}
+    </div>
+  </main>
+</MetroLayout>

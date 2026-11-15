@@ -1,0 +1,18 @@
+---
+// SPDX-License-Identifier: MPL-2.0
+import MetroLayout from '@/layouts/MetroLayout.astro';
+import MetroTile from '@/components/MetroTile.astro';
+import { siteConfig, tileConfig } from '@/config';
+---
+
+<MetroLayout>
+  <main style="min-height:100vh;padding:60px 0;">
+    <header class="screen-head">
+      <h1>{siteConfig.title}</h1>
+      <p>START</p>
+    </header>
+    <div class="tile-grid">
+      {tileConfig.map((t) => <MetroTile {...t} />)}
+    </div>
+  </main>
+</MetroLayout>
