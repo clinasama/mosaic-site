@@ -5,27 +5,44 @@
 <script>
   let Fancybox: any = null;
 
+  function wrapImages() {
+    const imgs = document.querySelectorAll(
+      'article img, .custom-md img, .prose img'
+    );
+    imgs.forEach((img) => {
+      const el = img as HTMLImageElement;
+      if (el.closest('a[data-fancybox]')) return;
+      if (el.closest('a.img-lightbox')) return;
+
+      const link = document.createElement('a');
+      link.href = el.getAttribute('src') || '';
+      link.className = 'img-lightbox';
+      link.setAttribute('data-fancybox', 'post');
+      link.setAttribute('data-caption', el.getAttribute('alt') || '');
+      el.parentNode?.insertBefore(link, el);
+      link.appendChild(el);
+    });
+  }
+
   async function setup() {
-    // 等待 DOM 中就绪的灯箱链接
+    wrapImages();
+
     const links = document.querySelectorAll('[data-fancybox="post"]');
     if (!links.length) return;
 
-    // 动态导入库和 CSS（只执行一次）
     if (!Fancybox) {
       const mod = await import('@fancyapps/ui');
       Fancybox = mod.Fancybox;
       await import('@fancyapps/ui/dist/fancybox/fancybox.css');
     }
 
-    // 关键：先解绑旧实例，再重新绑定，适配 ClientRouter 的页面切换
     try { Fancybox.unbind('[data-fancybox="post"]'); } catch {}
     try { Fancybox.destroy(); } catch {}
 
     Fancybox.bind('[data-fancybox="post"]', {
-      // 将 Fancybox 界面变量映射到站点主题
       mainStyle: {
-        '--fancybox-bg': 'oklch(0.1 0.02 var(--hue) / 0.96)',
-        '--fancybox-color': 'var(--text)',
+        '--f-bg': 'oklch(0.1 0.02 var(--hue) / 0.96)',
+        '--f-color': 'var(--text)',
         '--f-button-bg': 'var(--surface)',
         '--f-button-color': 'var(--text)',
         '--f-button-hover-bg': 'var(--primary)',
@@ -64,27 +81,24 @@
     });
   }
 
-  // 确保 DOM 就绪后执行
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', setup);
   } else {
     setup();
   }
-
-  // 核心：在 Astro 完成页面内容交换后，重新执行绑定
   document.addEventListener('astro:page-load', setup);
+  document.addEventListener('astro:before-swap', () => {
+    try { Fancybox?.destroy(); } catch {}
+  });
 </script>
 
 <style is:global>
-  /* 备用 CSS 覆盖，进一步确保主题一致性 */
   .fancybox__container {
-    --fancybox-bg: oklch(0.1 0.02 var(--hue) / 0.96) !important;
-    --fancybox-color: var(--text) !important;
+    --f-bg: oklch(0.1 0.02 var(--hue) / 0.96) !important;
+    --f-color: var(--text) !important;
   }
   .fancybox__toolbar,
-  .fancybox__nav {
-    color: var(--text) !important;
-  }
+  .fancybox__nav { color: var(--text) !important; }
   .fancybox__button {
     background: var(--surface) !important;
     border-radius: 0 !important;
@@ -98,7 +112,5 @@
     color: var(--text-muted) !important;
     font-family: 'Noto Sans Variable', 'Noto Sans SC Variable', sans-serif !important;
   }
-  .fancybox__progress {
-    background: var(--primary) !important;
-  }
+  .fancybox__progress { background: var(--primary) !important; }
 </style>
