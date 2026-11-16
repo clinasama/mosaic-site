@@ -195,3 +195,69 @@ article a.img-lightbox,
   line-height: 0;
   margin: 16px 0;
 }
+/* ── Repo Card (GitHub / Codeberg) ── */
+.repo-card {
+  display: block;
+  margin: 20px 0;
+  padding: 16px 18px;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  text-decoration: none;
+  color: var(--text);
+  transition: border-color 0.15s, background 0.15s;
+}
+.repo-card:hover {
+  border-color: var(--primary);
+  background: color-mix(in oklch, var(--primary) 8%, var(--surface));
+}
+.repo-card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.repo-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.repo-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.repo-name {
+  font-weight: 400;
+  font-size: 0.95rem;
+}
+.repo-platform {
+  font-size: 0.7rem;
+  padding: 1px 6px;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+}
+.repo-desc {
+  margin: 0 0 10px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.repo-stats {
+  display: flex;
+  gap: 14px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+.repo-lang {
+  padding: 1px 8px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 0.7rem;
+}
+.repo-card-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}

@@ -1,0 +1,66 @@
+---
+// SPDX-License-Identifier: MPL-2.0
+import { getEntry, render } from 'astro:content';
+import MetroLayout from '@/layouts/MetroLayout.astro';
+import BackButton from '@/components/BackButton.astro';
+
+const entry = await getEntry('spec', 'about');
+if (!entry) {
+  throw new Error('src/content/spec/about.md 不存在');
+}
+const { Content } = await render(entry);
+---
+
+<MetroLayout title="About · mosaic" description="关于 clina">
+  <main style="max-width:760px;margin:0 auto;padding:72px 24px 96px;line-height:1.8;">
+    <BackButton href="/" label="返回开始屏幕" />
+    <header style="margin:24px 0 40px;">
+      <h1 style="font-size:2.4rem;font-weight:200;margin:0;">About</h1>
+      <p style="margin:4px 0 0;opacity:.6;letter-spacing:.3em;font-size:.8rem;">ABOUT</p>
+    </header>
+    <article class="about-content">
+      <Content />
+    </article>
+  </main>
+</MetroLayout>
+
+<style is:global>
+  .about-content :global(h2) {
+    font-size: 1.4rem;
+    font-weight: 300;
+    margin: 32px 0 12px;
+  }
+  .about-content :global(h3) {
+    font-size: 1.1rem;
+    font-weight: 400;
+    margin: 24px 0 8px;
+  }
+  .about-content :global(p) {
+    margin: 12px 0;
+    line-height: 1.8;
+  }
+  .about-content :global(ul),
+  .about-content :global(ol) {
+    padding-left: 24px;
+    margin: 12px 0;
+  }
+  .about-content :global(li) { margin: 6px 0; }
+  .about-content :global(a) {
+    color: var(--primary);
+    text-decoration: none;
+    border-bottom: 1px solid color-mix(in oklch, var(--primary) 40%, transparent);
+  }
+  .about-content :global(a:hover) {
+    border-bottom-color: var(--primary);
+  }
+  .about-content :global(code) {
+    padding: 2px 6px;
+    background: var(--bg-deep);
+    font-size: 0.85em;
+    color: var(--primary);
+  }
+  .about-content :global(strong) {
+    color: var(--primary);
+    font-weight: 500;
+  }
+</style>

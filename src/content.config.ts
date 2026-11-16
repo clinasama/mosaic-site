@@ -29,4 +29,9 @@ const posts = defineCollection({
   }),
 });
 
-export const collections = { posts };
+const spec = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/spec' }),
+  schema: z.looseObject({}),
+});
+
+export const collections = { posts, spec };

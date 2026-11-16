@@ -1,0 +1,75 @@
+---
+// SPDX-License-Identifier: MPL-2.0
+interface Props {
+  platform: 'github' | 'codeberg';
+  repo: string;
+}
+
+const { platform, repo } = Astro.props;
+
+async function fetchRepo() {
+  try {
+    if (platform === 'github') {
+      const headers: Record<string, string> = { 'Accept': 'application/vnd.github+json' };
+      if (import.meta.env.GITHUB_TOKEN) {
+        headers['Authorization'] = `Bearer ${import.meta.env.GITHUB_TOKEN}`;
+      }
+      const res = await fetch(`https://api.github.com/repos/${repo}`, { headers });
+      if (!res.ok) return null;
+      const d = await res.json();
+      return {
+        name: d.full_name,
+        description: d.description,
+        stars: d.stargazers_count,
+        forks: d.forks_count,
+        language: d.language,
+        url: d.html_url,
+        owner: d.owner?.login,
+        avatar: d.owner?.avatar_url,
+        platform: 'GitHub',
+      };
+    }
+    const res = await fetch(`https://codeberg.org/api/v1/repos/${repo}`);
+    if (!res.ok) return null;
+    const d = await res.json();
+    return {
+      name: d.full_name,
+      description: d.description,
+      stars: d.stars_count,
+      forks: d.forks_count,
+      language: d.language,
+      url: d.html_url,
+      owner: d.owner?.login,
+      avatar: d.owner?.avatar_url,
+      platform: 'Codeberg',
+    };
+  } catch {
+    return null;
+  }
+}
+
+const info = await fetchRepo();
+---
+
+{info ? (
+  <a class="repo-card" href={info.url} target="_blank" rel="noopener noreferrer">
+    <div class="repo-card-head">
+      {info.avatar && <img class="repo-avatar" src={info.avatar} alt={info.owner} loading="lazy" />}
+      <div class="repo-meta">
+        <span class="repo-name">{info.name}</span>
+        <span class="repo-platform">{info.platform}</span>
+      </div>
+    </div>
+    {info.description && <p class="repo-desc">{info.description}</p>}
+    <div class="repo-stats">
+      {info.language && <span class="repo-lang">{info.language}</span>}
+      <span class="repo-stat">★ {info.stars}</span>
+      <span class="repo-stat">⑂ {info.forks}</span>
+    </div>
+  </a>
+) : (
+  <a class="repo-card repo-card-fallback" href={platform === 'github' ? `https://github.com/${repo}` : `https://codeberg.org/${repo}`} target="_blank" rel="noopener noreferrer">
+    <span class="repo-name">{repo}</span>
+    <span class="repo-platform">{platform === 'github' ? 'GitHub' : 'Codeberg'}</span>
+  </a>
+)}

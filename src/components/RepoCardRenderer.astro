@@ -1,0 +1,44 @@
+---
+// SPDX-License-Identifier: MPL-2.0
+import RepoCard from './RepoCard.astro';
+---
+
+<div id="repo-card-templates" hidden>
+  <template data-platform="github"><RepoCard platform="github" repo="__REPO__" /></template>
+  <template data-platform="codeberg"><RepoCard platform="codeberg" repo="__REPO__" /></template>
+</div>
+
+<script>
+  async function renderRepoCards() {
+    const placeholders = document.querySelectorAll('.repo-card-placeholder:not([data-rendered])');
+    if (!placeholders.length) return;
+
+    const templateContainer = document.getElementById('repo-card-templates');
+    if (!templateContainer) return;
+
+    for (const ph of placeholders) {
+      const platform = ph.getAttribute('data-platform');
+      const repo = ph.getAttribute('data-repo');
+      if (!platform || !repo) continue;
+
+      const tpl = templateContainer.querySelector(`template[data-platform="${platform}"]`);
+      if (!tpl) continue;
+
+      const html = tpl.innerHTML.replace(/__REPO__/g, repo);
+      const wrapper = document.createElement('div');
+      wrapper.innerHTML = html;
+      const card = wrapper.firstElementChild;
+      if (!card) continue;
+
+      ph.replaceWith(card);
+      ph.setAttribute('data-rendered', '1');
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderRepoCards);
+  } else {
+    renderRepoCards();
+  }
+  document.addEventListener('astro:page-load', renderRepoCards);
+</script>

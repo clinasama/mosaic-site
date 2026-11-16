@@ -8,7 +8,7 @@ export async function GET(context: APIContext) {
   const posts = await getCollection('posts', ({ data }) => !data.draft);
   return rss({
     title: siteConfig.title,
-    description: 'clina 的个人站点',
+    description: 'mosaic site',
     site: context.site ?? siteConfig.domain,
     items: posts.map((post) => ({
       title: post.data.title,

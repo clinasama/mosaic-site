@@ -3,6 +3,7 @@
 import { ClientRouter } from 'astro:transitions';
 import ThemeSwitcher from '@/components/ThemeSwitcher.astro';
 import FancyboxManager from '@/components/FancyboxManager.astro';
+import RepoCardRenderer from '@/components/RepoCardRenderer.astro';
 import { siteConfig } from '@/config';
 import '@fontsource-variable/noto-sans';
 import '@fontsource-variable/noto-sans-sc';
@@ -11,8 +12,8 @@ import '@/styles/metro.css';
 
 interface Props { title?: string; description?: string }
 const {
-  title = 'mosaic · clina',
-  description = 'clina 的个人站点，以 Windows 8 开始屏幕为界面，磁贴式导航。',
+  title = 'mosaic site',
+  description = 'mosaic site，以 Windows 8 开始屏幕为界面，磁贴式导航。',
 } = Astro.props;
 
 const defaultHue = siteConfig.themeColor.hue;
@@ -47,6 +48,7 @@ const themeFixed = siteConfig.themeColor.fixed;
     {!themeFixed && <ThemeSwitcher />}
     <slot />
     <FancyboxManager />
+    <RepoCardRenderer />
   </body>
 </html>
 

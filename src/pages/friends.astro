@@ -1,0 +1,204 @@
+---
+// SPDX-License-Identifier: MPL-2.0
+import { getEntry, render } from 'astro:content';
+import MetroLayout from '@/layouts/MetroLayout.astro';
+import BackButton from '@/components/BackButton.astro';
+import { friendsPageConfig, getEnabledFriends, getAllTags } from '@/config/friendsConfig';
+
+const friends = getEnabledFriends();
+const allTags = getAllTags(friends);
+
+let CustomContent: any = null;
+if (friendsPageConfig.showCustomContent) {
+  const entry = await getEntry('spec', 'friends');
+  if (entry) {
+    CustomContent = (await render(entry)).Content;
+  }
+}
+---
+
+<MetroLayout title={`${friendsPageConfig.title} · mosaic`} description={friendsPageConfig.description}>
+  <main style="max-width:960px;margin:0 auto;padding:72px 24px 96px;">
+    <BackButton href="/" label="返回开始屏幕" />
+
+    <header style="margin:24px 0 32px;">
+      <h1 style="font-size:2.4rem;font-weight:200;margin:0;">{friendsPageConfig.title}</h1>
+      <p style="margin:4px 0 0;opacity:.6;letter-spacing:.3em;font-size:.8rem;">FRIENDS</p>
+      {friendsPageConfig.description && (
+        <p style="margin:12px 0 0;opacity:.7;font-size:.9rem;">{friendsPageConfig.description}</p>
+      )}
+    </header>
+
+    {allTags.length > 0 && (
+      <div class="tag-filter" role="group" aria-label="按标签筛选">
+        <button type="button" class="tag-btn is-active" data-tag="*">All</button>
+        {allTags.map((tag) => (
+          <button type="button" class="tag-btn" data-tag={tag}>{tag}</button>
+        ))}
+      </div>
+    )}
+
+    <div class="friend-grid" style={`--cols:${friendsPageConfig.columns};`}>
+      {friends.map((friend) => (
+        <a
+          class="friend-card"
+          href={friend.siteurl}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-tags={(friend.tags ?? []).join(' ')}
+        >
+          <div class="friend-head">
+            <img class="friend-avatar" src={friend.imgurl} alt={friend.title} loading="lazy" />
+            <div class="friend-meta">
+              <span class="friend-name">{friend.title}</span>
+              {friend.tags?.length && (
+                <span class="friend-tags">{friend.tags.join(' · ')}</span>
+              )}
+            </div>
+          </div>
+          <p class="friend-desc">{friend.desc}</p>
+        </a>
+      ))}
+    </div>
+
+    {friends.length === 0 && (
+      <p style="opacity:.6;padding:32px 0;">还没有启用中的友链。</p>
+    )}
+
+    {CustomContent && (
+      <section class="friends-custom">
+        <CustomContent />
+      </section>
+    )}
+  </main>
+</MetroLayout>
+
+<script>
+  function setupFilter() {
+    const filter = document.querySelector('.tag-filter');
+    if (!filter) return;
+    const cards = Array.from(document.querySelectorAll<HTMLElement>('.friend-card'));
+    const buttons = Array.from(filter.querySelectorAll<HTMLButtonElement>('.tag-btn'));
+
+    function apply(tag: string) {
+      buttons.forEach((b) => b.classList.toggle('is-active', b.dataset.tag === tag));
+      cards.forEach((card) => {
+        const tags = (card.dataset.tags || '').split(/\s+/).filter(Boolean);
+        const show = tag === '*' || tags.includes(tag);
+        card.style.display = show ? '' : 'none';
+      });
+    }
+
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => apply(btn.dataset.tag || '*'));
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupFilter);
+  } else {
+    setupFilter();
+  }
+  document.addEventListener('astro:page-load', setupFilter);
+</script>
+
+<style is:global>
+  .tag-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+  .tag-btn {
+    padding: 6px 14px;
+    border: 1px solid var(--border-subtle);
+    background: var(--surface);
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+  }
+  .tag-btn:hover {
+    background: var(--surface-hover);
+    color: var(--text);
+  }
+  .tag-btn.is-active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+  }
+
+  .friend-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr));
+    gap: 16px;
+  }
+  @media (max-width: 800px) {
+    .friend-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 520px) {
+    .friend-grid { grid-template-columns: 1fr; }
+  }
+
+  .friend-card {
+    display: flex;
+    flex-direction: column;
+    padding: 18px;
+    background: var(--surface);
+    border: 1px solid var(--border-subtle);
+    text-decoration: none;
+    color: var(--text);
+    transition: border-color 0.15s, background 0.15s, transform 0.1s;
+  }
+  .friend-card:hover {
+    border-color: var(--primary);
+    background: color-mix(in oklch, var(--primary) 8%, var(--surface));
+  }
+  .friend-card:active {
+    transform: scale(0.98);
+  }
+  .friend-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .friend-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+  .friend-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .friend-name {
+    font-size: 0.95rem;
+    font-weight: 400;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .friend-tags {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+  .friend-desc {
+    margin: 0;
+    font-size: 0.82rem;
+    line-height: 1.6;
+    color: var(--text-muted);
+  }
+
+  .friends-custom {
+    margin-top: 56px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border-subtle);
+  }
+</style>

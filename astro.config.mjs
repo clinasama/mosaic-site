@@ -8,10 +8,12 @@ import expressiveCode from 'astro-expressive-code';
 import { pluginLineNumbers } from '@expressive-code/plugin-line-numbers';
 import { unified } from '@astrojs/markdown-remark';
 import { remarkReadingTime } from './src/plugins/remark-reading-time.ts';
+import remarkDirective from 'remark-directive';
+import { remarkRepoCard } from './src/plugins/remark-repo-card.js';
 import { rehypeImageLightbox } from './src/plugins/rehype-image-lightbox.mjs';
 
 export default defineConfig({
-  site: 'https://clina.top',
+  site: 'https://mosaic-example.netlify.app',
   image: {
     service: { entrypoint: 'astro/assets/services/noop' },
   },
@@ -34,7 +36,7 @@ export default defineConfig({
   markdown: {
     syntaxHighlight: false,
     processor: unified({
-      remarkPlugins: [remarkReadingTime],
+      remarkPlugins: [remarkDirective, remarkRepoCard, remarkReadingTime],
       rehypePlugins: [rehypeImageLightbox],
     }),
   },
