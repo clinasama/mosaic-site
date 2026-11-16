@@ -8,11 +8,12 @@ import expressiveCode from 'astro-expressive-code';
 import { pluginLineNumbers } from '@expressive-code/plugin-line-numbers';
 import { unified } from '@astrojs/markdown-remark';
 import { remarkReadingTime } from './src/plugins/remark-reading-time.ts';
+import { rehypeImageLightbox } from './src/plugins/rehype-image-lightbox.mjs';
 
 export default defineConfig({
   site: 'https://clina.top',
   image: {
-    service: { entrypoint: 'astro/assets/services/noop' },
+    service: { entrypoint: 'astro/assets/services/passthrough' },
   },
   integrations: [
     expressiveCode({
@@ -34,7 +35,7 @@ export default defineConfig({
     syntaxHighlight: false,
     processor: unified({
       remarkPlugins: [remarkReadingTime],
-      rehypePlugins: [],
+      rehypePlugins: [rehypeImageLightbox],
     }),
   },
   vite: {

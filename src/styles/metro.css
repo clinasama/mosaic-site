@@ -164,3 +164,34 @@ html[data-mode="light"] img[data-invert-on-light] {
   .image-grid.cols-3,
   .image-grid.cols-4 { grid-template-columns: repeat(2, 1fr); }
 }
+/* ── Markdown 图片（包裹在 a.img-lightbox 内）── */
+article a.img-lightbox,
+.custom-md a.img-lightbox {
+  display: block;
+  margin: 20px 0;
+  line-height: 0;
+  text-decoration: none;
+}
+article a.img-lightbox img,
+.custom-md a.img-lightbox img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  margin: 0;
+  cursor: zoom-in;
+}
+/* 强制正文图片响应式缩放 */
+article img,
+.custom-md img {
+  max-width: 100% !important;
+  height: auto !important;
+  display: block;
+}
+article a.img-lightbox,
+.custom-md a.img-lightbox {
+  display: block;
+  max-width: 100%;
+  line-height: 0;
+  margin: 16px 0;
+}

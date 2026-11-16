@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 import { ClientRouter } from 'astro:transitions';
 import ThemeSwitcher from '@/components/ThemeSwitcher.astro';
-import Lightbox from '@/components/Lightbox.astro';
+import FancyboxManager from '@/components/FancyboxManager.astro';
 import { siteConfig } from '@/config';
 import '@fontsource-variable/noto-sans';
 import '@fontsource-variable/noto-sans-sc';
@@ -46,7 +46,7 @@ const themeFixed = siteConfig.themeColor.fixed;
   <body>
     {!themeFixed && <ThemeSwitcher />}
     <slot />
-    <Lightbox />
+    <FancyboxManager />
   </body>
 </html>
 
