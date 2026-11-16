@@ -13,7 +13,7 @@ import { rehypeImageLightbox } from './src/plugins/rehype-image-lightbox.mjs';
 export default defineConfig({
   site: 'https://clina.top',
   image: {
-    service: { entrypoint: 'astro/assets/services/passthrough' },
+    service: { entrypoint: 'astro/assets/services/noop' },
   },
   integrations: [
     expressiveCode({
