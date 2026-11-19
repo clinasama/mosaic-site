@@ -1,5 +1,6 @@
 allowBuilds:
   esbuild: true
   puppeteer: true
+  workerd: true
 nodeLinker: hoisted
 packageImportMethod: copy
