@@ -3,8 +3,6 @@
 import { commentConfig } from '@/config';
 
 const { enabled, provider, giscus } = commentConfig;
-
-// 仅当启用、provider 为 giscus、且已填入真实 repoId 时才渲染
 const shouldRender =
   enabled &&
   provider === 'giscus' &&
@@ -26,22 +24,122 @@ const shouldRender =
       if (!container || container.dataset.loaded === '1') return;
       container.dataset.loaded = '1';
 
+      const giscusData = giscus;
+      let currentThemeUrl = null;
+
+      function readHue() {
+        const v = getComputedStyle(document.documentElement).getPropertyValue('--hue');
+        return (v || '300').trim();
+      }
+
+      function readMode() {
+        return document.documentElement.getAttribute('data-mode') || 'dark';
+      }
+
+      function buildThemeCss(hue, mode) {
+        const isDark = mode !== 'light';
+        if (isDark) {
+          return `
+:root {
+  --color-canvas-default: oklch(0.15 0.03 ${hue});
+  --color-canvas-subtle: oklch(0.20 0.04 ${hue});
+  --color-canvas-inset: oklch(0.12 0.02 ${hue});
+  --color-fg-default: #ffffff;
+  --color-fg-muted: rgba(255,255,255,0.6);
+  --color-fg-subtle: rgba(255,255,255,0.4);
+  --color-border-default: rgba(255,255,255,0.1);
+  --color-border-muted: rgba(255,255,255,0.06);
+  --color-accent-fg: oklch(0.65 0.22 ${hue});
+  --color-accent-emphasis: oklch(0.55 0.18 ${hue});
+  --color-accent-muted: oklch(0.55 0.18 ${hue} / 0.4);
+  --color-accent-subtle: oklch(0.55 0.18 ${hue} / 0.15);
+  --color-btn-primary-bg: oklch(0.65 0.22 ${hue});
+  --color-btn-primary-hover-bg: oklch(0.70 0.20 ${hue});
+  --color-btn-primary-text: #ffffff;
+  --color-neutral-muted: rgba(255,255,255,0.08);
+  --color-neutral-subtle: rgba(255,255,255,0.04);
+  --font-family-sans: 'Noto Sans Variable', 'Noto Sans SC Variable', sans-serif;
+  --font-family-monospace: 'JetBrains Mono Variable', monospace;
+}`;
+        }
+        return `
+:root {
+  --color-canvas-default: oklch(0.99 0.01 ${hue});
+  --color-canvas-subtle: oklch(0.95 0.02 ${hue});
+  --color-canvas-inset: oklch(0.93 0.02 ${hue});
+  --color-fg-default: #1a1a1a;
+  --color-fg-muted: rgba(0,0,0,0.6);
+  --color-fg-subtle: rgba(0,0,0,0.4);
+  --color-border-default: rgba(0,0,0,0.1);
+  --color-border-muted: rgba(0,0,0,0.06);
+  --color-accent-fg: oklch(0.50 0.18 ${hue});
+  --color-accent-emphasis: oklch(0.40 0.14 ${hue});
+  --color-accent-muted: oklch(0.40 0.14 ${hue} / 0.4);
+  --color-accent-subtle: oklch(0.40 0.14 ${hue} / 0.15);
+  --color-btn-primary-bg: oklch(0.50 0.18 ${hue});
+  --color-btn-primary-hover-bg: oklch(0.45 0.16 ${hue});
+  --color-btn-primary-text: #ffffff;
+  --color-neutral-muted: rgba(0,0,0,0.06);
+  --color-neutral-subtle: rgba(0,0,0,0.03);
+  --font-family-sans: 'Noto Sans Variable', 'Noto Sans SC Variable', sans-serif;
+  --font-family-monospace: 'JetBrains Mono Variable', monospace;
+}`;
+      }
+
+      function makeThemeUrl(hue, mode) {
+        const css = buildThemeCss(hue, mode);
+        const blob = new Blob([css], { type: 'text/css' });
+        return URL.createObjectURL(blob);
+      }
+
+      function updateGiscusTheme() {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        const newUrl = makeThemeUrl(readHue(), readMode());
+        iframe.contentWindow?.postMessage(
+          { giscus: { setConfig: { theme: newUrl } } },
+          'https://giscus.app'
+        );
+        if (currentThemeUrl) URL.revokeObjectURL(currentThemeUrl);
+        currentThemeUrl = newUrl;
+      }
+
+      // 首次生成主题 URL 并注入 Giscus 脚本
+      currentThemeUrl = makeThemeUrl(readHue(), readMode());
+
       const script = document.createElement('script');
       script.src = 'https://giscus.app/client.js';
-      script.setAttribute('data-repo', giscus.repo);
-      script.setAttribute('data-repo-id', giscus.repoId);
-      script.setAttribute('data-category', giscus.category);
-      script.setAttribute('data-category-id', giscus.categoryId);
-      script.setAttribute('data-mapping', giscus.mapping);
+      script.setAttribute('data-repo', giscusData.repo);
+      script.setAttribute('data-repo-id', giscusData.repoId);
+      script.setAttribute('data-category', giscusData.category);
+      script.setAttribute('data-category-id', giscusData.categoryId);
+      script.setAttribute('data-mapping', giscusData.mapping);
       script.setAttribute('data-strict', '0');
-      script.setAttribute('data-reactions-enabled', giscus.reactionsEnabled);
+      script.setAttribute('data-reactions-enabled', giscusData.reactionsEnabled);
       script.setAttribute('data-emit-metadata', '0');
-      script.setAttribute('data-input-position', giscus.inputPosition);
-      script.setAttribute('data-theme', 'dark');
-      script.setAttribute('data-lang', giscus.lang);
+      script.setAttribute('data-input-position', giscusData.inputPosition);
+      script.setAttribute('data-theme', currentThemeUrl);
+      script.setAttribute('data-lang', giscusData.lang);
       script.crossOrigin = 'anonymous';
       script.async = true;
       container.appendChild(script);
+
+      // 监听色相滑块（html style 属性）与明暗切换（data-mode 属性）
+      const observer = new MutationObserver((mutations) => {
+        for (const m of mutations) {
+          if (
+            m.type === 'attributes' &&
+            (m.attributeName === 'style' || m.attributeName === 'data-mode')
+          ) {
+            updateGiscusTheme();
+            return;
+          }
+        }
+      });
+      observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['style', 'data-mode'],
+      });
     })();
   </script>
 )}
