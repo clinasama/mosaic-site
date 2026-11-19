@@ -9,7 +9,7 @@ interface Props {
   size?: 'medium' | 'wide' | 'large';
   color?: string;
 }
-const { label, icon, href, size = 'medium', color = 'var(--violet)' } = Astro.props;
+const { label, icon, href, size = 'medium', color = 'var(--accent)' } = Astro.props;
 ---
 
 <a class:list={['tile', `tile-${size}`]} href={href} data-href={href} style={`--tile-bg:${color}`}>
