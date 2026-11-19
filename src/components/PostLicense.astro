@@ -1,0 +1,55 @@
+---
+// SPDX-License-Identifier: MPL-2.0
+import { siteConfig } from '@/config';
+
+interface Props {
+  author?: string;
+  sourceLink?: string;
+  licenseName?: string;
+  licenseUrl?: string;
+  published?: Date | string;
+}
+
+const { author, sourceLink, licenseName, licenseUrl, published } = Astro.props;
+const year = published ? new Date(published).getFullYear() : new Date().getFullYear();
+const finalLicenseName = licenseName ?? siteConfig.license.defaultName;
+const finalLicenseUrl = licenseUrl ?? siteConfig.license.defaultUrl;
+const finalAuthor = author ?? siteConfig.author;
+const showLicense = finalLicenseName && siteConfig.license.enabled;
+---
+
+{(finalAuthor || sourceLink || showLicense) && (
+  <footer class="post-license">
+    <div class="license-row">
+      {finalAuthor && (
+        <span class="license-item">
+          <span class="license-label">作者</span>
+          <span class="license-value">{finalAuthor}</span>
+        </span>
+      )}
+      {sourceLink && (
+        <span class="license-item">
+          <span class="license-label">来源</span>
+          <a class="license-value" href={sourceLink} target="_blank" rel="noopener noreferrer">
+            {sourceLink}
+          </a>
+        </span>
+      )}
+      {showLicense && (
+        <span class="license-item">
+          <span class="license-label">许可协议</span>
+          {finalLicenseUrl ? (
+            <a class="license-value" href={finalLicenseUrl} target="_blank" rel="noopener noreferrer">
+              {finalLicenseName}
+            </a>
+          ) : (
+            <span class="license-value">{finalLicenseName}</span>
+          )}
+        </span>
+      )}
+    </div>
+    <p class="license-copyright">
+      © {year} {finalAuthor} · 本文采用 {finalLicenseName} 进行授权
+    </p>
+  </footer>
+)}

@@ -1,0 +1,47 @@
+---
+// SPDX-License-Identifier: MPL-2.0
+import { commentConfig } from '@/config';
+
+const { enabled, provider, giscus } = commentConfig;
+
+// 仅当启用、provider 为 giscus、且已填入真实 repoId 时才渲染
+const shouldRender =
+  enabled &&
+  provider === 'giscus' &&
+  !!giscus &&
+  giscus.repoId !== 'R_kgDOxxxxxxx';
+---
+
+{shouldRender && (
+  <section class="comments-section" id="comments">
+    <h2 class="comments-title">评论</h2>
+    <div class="giscus-container"></div>
+  </section>
+)}
+
+{shouldRender && giscus && (
+  <script is:inline define:vars={{ giscus }}>
+    (() => {
+      const container = document.querySelector('.giscus-container');
+      if (!container || container.dataset.loaded === '1') return;
+      container.dataset.loaded = '1';
+
+      const script = document.createElement('script');
+      script.src = 'https://giscus.app/client.js';
+      script.setAttribute('data-repo', giscus.repo);
+      script.setAttribute('data-repo-id', giscus.repoId);
+      script.setAttribute('data-category', giscus.category);
+      script.setAttribute('data-category-id', giscus.categoryId);
+      script.setAttribute('data-mapping', giscus.mapping);
+      script.setAttribute('data-strict', '0');
+      script.setAttribute('data-reactions-enabled', giscus.reactionsEnabled);
+      script.setAttribute('data-emit-metadata', '0');
+      script.setAttribute('data-input-position', giscus.inputPosition);
+      script.setAttribute('data-theme', 'dark');
+      script.setAttribute('data-lang', giscus.lang);
+      script.crossOrigin = 'anonymous';
+      script.async = true;
+      container.appendChild(script);
+    })();
+  </script>
+)}

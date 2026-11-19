@@ -3,6 +3,8 @@
 import { getCollection, render } from 'astro:content';
 import MetroLayout from '@/layouts/MetroLayout.astro';
 import BackButton from '@/components/BackButton.astro';
+import PostLicense from '@/components/PostLicense.astro';
+import Comments from '@/components/Comments.astro';
 import { formatDate } from '@/utils/date';
 
 export async function getStaticPaths() {
@@ -60,6 +62,16 @@ const author = post.data.author;
         )}
       </footer>
     )}
+      
+    <PostLicense
+      author={post.data.author}
+      sourceLink={post.data.sourceLink}
+      licenseName={post.data.licenseName}
+      licenseUrl={post.data.licenseUrl}
+      published={post.data.published ?? post.data.pubDate}
+    />
+
+    {post.data.comment !== false && <Comments />}
   </article>
 </MetroLayout>
 

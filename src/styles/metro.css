@@ -261,3 +261,56 @@ article a.img-lightbox,
   align-items: center;
   justify-content: space-between;
 }
+/* ── Post License & Comments ── */
+.post-license {
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-subtle);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+.license-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 12px;
+}
+.license-item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.license-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+.license-value {
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s;
+}
+a.license-value:hover {
+  border-bottom-color: var(--primary);
+  color: var(--primary);
+}
+.license-copyright {
+  margin: 0;
+  font-size: 0.78rem;
+  opacity: 0.6;
+  line-height: 1.6;
+}
+
+.comments-section {
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border-subtle);
+}
+.comments-title {
+  font-size: 1.2rem;
+  font-weight: 300;
+  margin: 0 0 20px;
+  letter-spacing: 0.04em;
+}
